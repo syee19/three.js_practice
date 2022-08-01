@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Three.js Snowball</title>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+      }
+      #info {
+        color: aliceblue;
+        z-index: 1;
+      }
+      ul {
+        list-style: none;
+        margin-top: 0px;
+      }
+      .btn {
+        margin: 20px;
+        position: relative;
+        border: none;
+        display: inline-block;
+        padding: 12px 18px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.25s;
+
+        background-color: #5b8d80;
+        color: aliceblue;
+      }
+      .container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgb(27, 27, 27);
+      }
+      #c {
+        margin: auto;
+        width: 80vw;
+        height: auto;
+      }
+      @media (min-width: 752px) {
+        #c {
+          margin: auto;
+          width: 600px;
+          height: 600px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <canvas id="c"></canvas>
+      </div>
+      <div id="info">
+        <a id="start_demo" class="btn" href="#" role="button">Start demo</a>
+        <ul>
+          <li>
+            X-axis (&beta;): <span id="Orientation_b">0</span><span>&deg;</span>
+          </li>
+          <li>
+            Y-axis (&gamma;): <span id="Orientation_g">0</span
+            ><span>&deg;</span>
+          </li>
+          <li>
+            Z-axis (&alpha;): <span id="Orientation_a">0</span
+            ><span>&deg;</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://threejs.org/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module" src="./snowball_three.js"></script>
+  </body>
+
+  <script type="module">
+    // Three.js - Responsive in Paragraph
+    // from https://threejs.org/manual/examples/responsive-paragraph.html
+  </script>
+</html>
