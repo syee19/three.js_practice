@@ -92,6 +92,14 @@ function main() {
     return needResize;
   }
 
+  let dir = new THREE.Vector3();
+  const origin = new THREE.Vector3(0, 0, 0);
+  const length = 1;
+  const hex = 0xffffff;
+
+  const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
+  scene.add(arrowHelper);
+
   // render 혹은 animate loop를 불러 렌더링하기
   function render(time) {
     time *= 0.001;
@@ -109,6 +117,16 @@ function main() {
       arr[i].lookAt(camera.position);
     }
 
+    // Yaw, Pitch, Roll 반영
+    var alpha = document.getElementById("Orientation_a").innerHTML;
+    var betta = document.getElementById("Orientation_b").innerHTML;
+    var gamma = document.getElementById("Orientation_g").innerHTML;
+
+    //dir.normalize();
+    //vec.z = document.getElementById("Orientation_a").innerHTML;
+    console.log(dir);
+    //arrowHelper.lookAt(dir);
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
   }
@@ -125,7 +143,9 @@ function getDistance(point) {
   //dist = Math.cqrt(x2 + y2 + z2);
   var dist = Math.sqrt(x2 + y2 + z2);
   return dist;
-} //Orientation
+}
+
+//Orientation
 function handleOrientation(event) {
   updateFieldIfNotNull("Orientation_a", event.alpha);
   updateFieldIfNotNull("Orientation_b", event.beta);
@@ -153,14 +173,13 @@ demo_button.onclick = function (e) {
   if (is_running) {
     window.removeEventListener("deviceorientation", handleOrientation);
     demo_button.innerHTML = "Start demo";
-    demo_button.classList.add("btn-success");
-    demo_button.classList.remove("btn-danger");
+    updateFieldIfNotNull("Orientation_a", 0);
+    updateFieldIfNotNull("Orientation_b", 0);
+    updateFieldIfNotNull("Orientation_g", 0);
     is_running = false;
   } else {
     window.addEventListener("deviceorientation", handleOrientation);
     document.getElementById("start_demo").innerHTML = "Stop demo";
-    demo_button.classList.remove("btn-success");
-    demo_button.classList.add("btn-danger");
     is_running = true;
   }
 };
