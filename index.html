@@ -169,7 +169,6 @@
 
         //중력 방향 arrowHelper
         const dir = new THREE.Vector3(0, -1, 0);
-        dir.normalize();
         const origin = new THREE.Vector3(0, 0, 0);
         const length = 1;
         const hex = 0xffffff;
@@ -187,16 +186,6 @@
           if (resizeRendererToDisplaySize(renderer)) {
             camera.updateProjectionMatrix();
           }
-          //* 애니메이션
-          for (var i = 0; i < arr.length; i++) {
-            //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
-
-            arr[i].position.y -= velo[i];
-            if (getDistance(arr[i]) >= 2.3) {
-              arr[i].position.y *= -1;
-            }
-            arr[i].lookAt(camera.position);
-          }
 
           if (is_running) {
             var gx = document.getElementById("Accelerometer_gx");
@@ -204,12 +193,25 @@
             var gz = document.getElementById("Accelerometer_gz");
 
             dir.set(gx, gy, gz);
-            dir.normalize();
           } else {
             dir.set(0, -1, 0);
           }
           arrowHelper.setDirection(dir);
-          arrowHelper.setLength(dir.length());
+          arrowHelper.setLength(dir.length()); //* 애니메이션
+
+          for (var i = 0; i < arr.length; i++) {
+            //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
+
+            arr[i].position.x += velo[i] * dir.x;
+            arr[i].position.y += velo[i] * dir.y;
+            arr[i].position.z += velo[i] * dir.z;
+            if (getDistance(arr[i]) >= 2.3) {
+              arr[i].position.x *= -1;
+              arr[i].position.y *= -1;
+              arr[i].position.z *= -1;
+            }
+            arr[i].lookAt(camera.position);
+          }
 
           renderer.render(scene, camera);
           requestAnimationFrame(render);
