@@ -12,6 +12,8 @@
         margin: 0;
         height: 100%;
         background-size: cover;
+        overflow: hidden;
+        touch-action: none;
       }
       #info {
         color: aliceblue;
@@ -181,6 +183,10 @@
         );
         scene.add(arrowHelper);
 
+        var gx;
+        var gy;
+        var gz;
+
         // render 혹은 animate loop를 불러 렌더링하기
         function render(time) {
           if (resizeRendererToDisplaySize(renderer)) {
@@ -188,10 +194,9 @@
           }
 
           if (is_running) {
-            var gx = document.getElementById("Accelerometer_gx");
-            var gy = document.getElementById("Accelerometer_gy");
-            var gz = document.getElementById("Accelerometer_gz");
-
+            gx = document.getElementById("Accelerometer_gx").innerHTML;
+            gy = document.getElementById("Accelerometer_gy").innerHTML;
+            gz = document.getElementById("Accelerometer_gz").innerHTML;
             dir.set(gx, gy, gz);
           } else {
             dir.set(0, -1, 0);
@@ -201,7 +206,6 @@
 
           for (var i = 0; i < arr.length; i++) {
             //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
-
             arr[i].position.x += velo[i] * dir.x;
             arr[i].position.y += velo[i] * dir.y;
             arr[i].position.z += velo[i] * dir.z;
