@@ -10,6 +10,8 @@
     <style>
       body {
         margin: 0;
+        height: 100%;
+        background-size: cover;
       }
       #info {
         color: aliceblue;
@@ -18,6 +20,7 @@
       ul {
         list-style: none;
         margin-top: 0px;
+        padding: 10px;
       }
       .btn {
         margin: 20px;
@@ -29,7 +32,6 @@
         text-decoration: none;
         font-weight: 600;
         transition: 0.25s;
-
         background-color: #5b8d80;
         color: aliceblue;
       }
@@ -41,14 +43,18 @@
         justify-content: center;
         background: rgb(27, 27, 27);
       }
+      .inner {
+        height: auto;
+        flex-direction: row;
+      }
       #c {
-        margin: auto;
+        margin-bottom: 0;
         width: 80vw;
         height: auto;
       }
       @media (min-width: 752px) {
         #c {
-          margin: auto;
+          margin-bottom: 0;
           width: 600px;
           height: 600px;
         }
@@ -59,34 +65,41 @@
     <div class="container">
       <canvas id="c"></canvas>
       <div id="info">
-        <a id="start_demo" class="btn" href="#" role="button">Start demo</a>
-        <ul>
-          <li>
-            X-axis (&beta;): <span id="Orientation_b">0.0</span
-            ><span>&deg;</span>
-          </li>
-          <li>
-            Y-axis (&gamma;): <span id="Orientation_g">0.0</span
-            ><span>&deg;</span>
-          </li>
-          <li>
-            Z-axis (&alpha;): <span id="Orientation_a">0.0</span
-            ><span>&deg;</span>
-          </li>
-        </ul>
+        <div class="container inner">
+          <a id="start_demo" class="btn" href="#" role="button">Start demo</a>
+        </div>
+        <div class="container inner">
+          <ul>
+            <li>
+              X-axis (&beta;): <span id="Orientation_b">0.0</span
+              ><span>&deg;</span>
+            </li>
+            <li>
+              Y-axis (&gamma;): <span id="Orientation_g">0.0</span
+              ><span>&deg;</span>
+            </li>
+            <li>
+              Z-axis (&alpha;): <span id="Orientation_a">0.0</span
+              ><span>&deg;</span>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              X-axis: <span id="Accelerometer_gx">0.0</span
+              ><span> m/s<sup>2</sup></span>
+            </li>
+            <li>
+              Y-axis: <span id="Accelerometer_gy">0.0</span
+              ><span> m/s<sup>2</sup></span>
+            </li>
+            <li>
+              Z-axis: <span id="Accelerometer_gz">0.0</span
+              ><span> m/s<sup>2</sup></span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-    <!--
-
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://threejs.org/build/three.module.js"
-        }
-      }
-    </script>
-
-    -->
     <script type="module">
       import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r125/build/three.module.js";
 
@@ -171,16 +184,23 @@
           velo.push(0.005 + Math.random() / 100);
         }
 
-        function resizeRendererToDisplaySize(renderer) {
-          const canvas = renderer.domElement;
-          const width = canvas.clientWidth;
-          const height = canvas.clientWidth;
-          const needResize = canvas.width !== width || canvas.height !== height;
-          if (needResize) {
-            renderer.setSize(width, height, false);
-          }
-          return needResize;
-        }
+        //중력 방향 arrowHelper
+        const dir = new THREE.Vector3(0, -1, 0);
+        const origin = new THREE.Vector3(0, 0, 0);
+        const length = 1;
+        const hex = 0xffffff;
+        const arrowHelper = new THREE.ArrowHelper(
+          dir,
+          origin,
+          length,
+          hex,
+          0.4
+        );
+        scene.add(arrowHelper);
+
+        var gx = document.getElementById("Accelerometer_gx");
+        var gy = document.getElementById("Accelerometer_gy");
+        var gz = document.getElementById("Accelerometer_gz");
 
         // render 혹은 animate loop를 불러 렌더링하기
         function render(time) {
@@ -199,6 +219,11 @@
             arr[i].lookAt(camera.position);
           }
 
+          dir.set(gx, gy, gz);
+          if (dir.length != 0) {
+            arrowHelper.setDirection(dir.normalize());
+          }
+
           renderer.render(scene, camera);
           requestAnimationFrame(render);
         }
@@ -207,6 +232,17 @@
       }
 
       main();
+
+      function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientWidth;
+        const needResize = canvas.width !== width || canvas.height !== height;
+        if (needResize) {
+          renderer.setSize(width, height, false);
+        }
+        return needResize;
+      }
 
       function getDistance(point) {
         var x2 = point.position.x * point.position.x;
@@ -227,15 +263,15 @@
       function handleMotion(event) {
         updateFieldIfNotNull(
           "Accelerometer_gx",
-          event.accelerationIncludingGravity.x
+          event.accelerationIncludingGravity.x - event.acceleration.x
         );
         updateFieldIfNotNull(
           "Accelerometer_gy",
-          event.accelerationIncludingGravity.y
+          event.accelerationIncludingGravity.y - event.acceleration.y
         );
         updateFieldIfNotNull(
           "Accelerometer_gz",
-          event.accelerationIncludingGravity.z
+          event.accelerationIncludingGravity.z - event.acceleration.z
         );
       }
 
@@ -254,9 +290,9 @@
           DeviceMotionEvent.requestPermission()
             .then((state) => {
               if (state === "granted") {
-                window.alert("granted!");
+                //window.alert("granted!");
               } else {
-                window.alert("denied!");
+                //window.alert("denied!");
               }
             })
             .catch(console.error);
@@ -268,6 +304,12 @@
           window.removeEventListener("devicemotion", handleMotion);
           window.removeEventListener("deviceorientation", handleOrientation);
           demo_button.innerHTML = "Start demo";
+          updateFieldIfNotNull("Orientation_a", 0.0);
+          updateFieldIfNotNull("Orientation_b", 0.0);
+          updateFieldIfNotNull("Orientation_g", 0.0);
+          updateFieldIfNotNull("Accelerometer_gx", 0.0);
+          updateFieldIfNotNull("Accelerometer_gy", 0.0);
+          updateFieldIfNotNull("Accelerometer_gz", 0.0);
           is_running = false;
         } else {
           window.addEventListener("devicemotion", handleMotion);
@@ -279,70 +321,3 @@
     </script>
   </body>
 </html>
-<!--
-
-
-  <script>
-    // Three.js - Responsive in Paragraph
-    // from https://threejs.org/manual/examples/responsive-paragraph.html//Orientation
-    function handleOrientation(event) {
-      updateFieldIfNotNull("Orientation_a", event.alpha);
-      updateFieldIfNotNull("Orientation_b", event.beta);
-      updateFieldIfNotNull("Orientation_g", event.gamma);
-    }
-
-    function handleMotion(event) {
-      updateFieldIfNotNull(
-        "Accelerometer_gx",
-        event.accelerationIncludingGravity.x
-      );
-      updateFieldIfNotNull(
-        "Accelerometer_gy",
-        event.accelerationIncludingGravity.y
-      );
-      updateFieldIfNotNull(
-        "Accelerometer_gz",
-        event.accelerationIncludingGravity.z
-      );
-
-      updateFieldIfNotNull("Accelerometer_x", event.acceleration.x);
-      updateFieldIfNotNull("Accelerometer_y", event.acceleration.y);
-      updateFieldIfNotNull("Accelerometer_z", event.acceleration.z);
-    }
-
-    function updateFieldIfNotNull(fieldName, value, precision = 1) {
-      if (value != null)
-        document.getElementById(fieldName).innerHTML = value.toFixed(precision);
-    }
-
-    let is_running = false;
-    let demo_button = document.getElementById("start_demo");
-    demo_button.onclick = function (e) {
-      e.preventDefault();
-
-      // Request permission for iOS 13+ devices
-      if (
-        DeviceMotionEvent &&
-        typeof DeviceMotionEvent.requestPermission === "function"
-      ) {
-        DeviceMotionEvent.requestPermission();
-      }
-
-      if (is_running) {
-        window.removeEventListener("deviceorientation", handleOrientation);
-        window.removeEventListener("devicemotion", handleMotion);
-        demo_button.innerHTML = "Start demo";
-        updateFieldIfNotNull("Orientation_a", 0);
-        updateFieldIfNotNull("Orientation_b", 0);
-        updateFieldIfNotNull("Orientation_g", 0);
-        is_running = false;
-      } else {
-        window.addEventListener("deviceorientation", handleOrientation);
-        window.addEventListener("devicemotion", handleMotion);
-        document.getElementById("start_demo").innerHTML = "Stop demo";
-        is_running = true;
-      }
-    };
-  </script>
-
--->
