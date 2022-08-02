@@ -182,13 +182,8 @@
         );
         scene.add(arrowHelper);
 
-        var gx = document.getElementById("Accelerometer_gx");
-        var gy = document.getElementById("Accelerometer_gy");
-        var gz = document.getElementById("Accelerometer_gz");
-
         // render 혹은 animate loop를 불러 렌더링하기
         function render(time) {
-          time *= 0.001;
           if (resizeRendererToDisplaySize(renderer)) {
             camera.updateProjectionMatrix();
           }
@@ -204,12 +199,17 @@
           }
 
           if (is_running) {
+            var gx = document.getElementById("Accelerometer_gx");
+            var gy = document.getElementById("Accelerometer_gy");
+            var gz = document.getElementById("Accelerometer_gz");
+
             dir.set(gx, gy, gz);
-            dir.normalize;
+            dir.normalize();
           } else {
             dir.set(0, -1, 0);
           }
-          arrowHelper.setDirection(dir.normalize());
+          arrowHelper.setDirection(dir);
+          arrowHelper.setLength(dir.length());
 
           renderer.render(scene, camera);
           requestAnimationFrame(render);
