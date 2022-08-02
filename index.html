@@ -19,7 +19,6 @@
       }
       ul {
         list-style: none;
-        margin-top: 0px;
         padding: 10px;
       }
       .btn {
@@ -49,7 +48,7 @@
       }
       #c {
         margin-bottom: 0;
-        width: 80vw;
+        width: 90vw;
         height: auto;
       }
       @media (min-width: 752px) {
@@ -67,22 +66,6 @@
       <div id="info">
         <div class="container inner">
           <a id="start_demo" class="btn" href="#" role="button">Start demo</a>
-        </div>
-        <div class="container inner">
-          <ul>
-            <li>
-              X-axis (&beta;): <span id="Orientation_b">0.0</span
-              ><span>&deg;</span>
-            </li>
-            <li>
-              Y-axis (&gamma;): <span id="Orientation_g">0.0</span
-              ><span>&deg;</span>
-            </li>
-            <li>
-              Z-axis (&alpha;): <span id="Orientation_a">0.0</span
-              ><span>&deg;</span>
-            </li>
-          </ul>
           <ul>
             <li>
               X-axis: <span id="Accelerometer_gx">0.0</span
@@ -186,6 +169,7 @@
 
         //중력 방향 arrowHelper
         const dir = new THREE.Vector3(0, -1, 0);
+        dir.normalize();
         const origin = new THREE.Vector3(0, 0, 0);
         const length = 1;
         const hex = 0xffffff;
@@ -219,10 +203,13 @@
             arr[i].lookAt(camera.position);
           }
 
-          dir.set(gx, gy, gz);
-          if (dir.length != 0) {
-            arrowHelper.setDirection(dir.normalize());
+          if (is_running) {
+            dir.set(gx, gy, gz);
+            dir.normalize;
+          } else {
+            dir.set(0, -1, 0);
           }
+          arrowHelper.setDirection(dir.normalize());
 
           renderer.render(scene, camera);
           requestAnimationFrame(render);
@@ -254,12 +241,6 @@
       }
 
       //Orientation
-      function handleOrientation(event) {
-        updateFieldIfNotNull("Orientation_a", event.alpha);
-        updateFieldIfNotNull("Orientation_b", event.beta);
-        updateFieldIfNotNull("Orientation_g", event.gamma);
-      }
-
       function handleMotion(event) {
         updateFieldIfNotNull(
           "Accelerometer_gx",
@@ -280,6 +261,7 @@
           document.getElementById(fieldName).innerHTML =
             value.toFixed(precision);
       }
+
       let is_running = false;
 
       let demo_button = document.getElementById("start_demo");
@@ -302,18 +284,13 @@
 
         if (is_running) {
           window.removeEventListener("devicemotion", handleMotion);
-          window.removeEventListener("deviceorientation", handleOrientation);
           demo_button.innerHTML = "Start demo";
-          updateFieldIfNotNull("Orientation_a", 0.0);
-          updateFieldIfNotNull("Orientation_b", 0.0);
-          updateFieldIfNotNull("Orientation_g", 0.0);
           updateFieldIfNotNull("Accelerometer_gx", 0.0);
           updateFieldIfNotNull("Accelerometer_gy", 0.0);
           updateFieldIfNotNull("Accelerometer_gz", 0.0);
           is_running = false;
         } else {
           window.addEventListener("devicemotion", handleMotion);
-          window.addEventListener("deviceorientation", handleOrientation);
           document.getElementById("start_demo").innerHTML = "Stop demo";
           is_running = true;
         }
