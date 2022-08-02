@@ -155,7 +155,7 @@
         var arr = [];
         var velo = [];
         var len = 10;
-        const n = 40;
+        var n = 50;
         const seta = (Math.PI * 2) / n;
         var shx, shy, shz;
         for (var i = 0; i < n; i++) {
@@ -166,7 +166,7 @@
           len = Math.random() * 2.3;
           arr.push(addShape(len * shx, len * shy, len * shz));
           //arr.push(addShape(0, 0, 0));
-          velo.push(0.005 + Math.random() / 100);
+          velo.push(0.003 + Math.random() / 100);
         }
 
         //중력 방향 arrowHelper
@@ -198,12 +198,14 @@
             gy = document.getElementById("Accelerometer_gy").innerHTML;
             gz = document.getElementById("Accelerometer_gz").innerHTML;
             dir.set(gx, gy, gz);
+            dir.normalize();
           } else {
             dir.set(0, -1, 0);
           }
           arrowHelper.setDirection(dir);
-          arrowHelper.setLength(dir.length()); //* 애니메이션
+          arrowHelper.setLength(dir.length());
 
+          //* 애니메이션
           for (var i = 0; i < arr.length; i++) {
             //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
             arr[i].position.x += velo[i] * dir.x;
