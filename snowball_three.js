@@ -118,12 +118,25 @@ function main() {
     }
 
     // Yaw, Pitch, Roll 반영
-    var alpha = document.getElementById("Orientation_a").innerHTML;
-    var betta = document.getElementById("Orientation_b").innerHTML;
-    var gamma = document.getElementById("Orientation_g").innerHTML;
+    //var alpha = document.getElementById("Orientation_a").innerHTML;
+    //var betta = document.getElementById("Orientation_b").innerHTML;
+    //var gamma = document.getElementById("Orientation_g").innerHTML;
 
-    //dir.normalize();
-    //vec.z = document.getElementById("Orientation_a").innerHTML;
+    var gx =
+      document.getElementById("Acceleromoter_gx") -
+      document.getElementById("Accelerometer_x");
+    var gy =
+      document.getElementById("Acceleromoter_gy") -
+      document.getElementById("Accelerometer_y");
+    var gz =
+      document.getElementById("Acceleromoter_gx") -
+      document.getElementById("Accelerometer_z");
+
+    dir.set(gx, gy, gz);
+    //dir.set(alpha, betta, gamma);
+    dir = dir.normalize();
+    arrowHelper.setDirection(dir);
+    arrowHelper.setLength(dir.length());
     console.log(dir);
     //arrowHelper.lookAt(dir);
 
@@ -144,42 +157,3 @@ function getDistance(point) {
   var dist = Math.sqrt(x2 + y2 + z2);
   return dist;
 }
-
-//Orientation
-function handleOrientation(event) {
-  updateFieldIfNotNull("Orientation_a", event.alpha);
-  updateFieldIfNotNull("Orientation_b", event.beta);
-  updateFieldIfNotNull("Orientation_g", event.gamma);
-}
-
-function updateFieldIfNotNull(fieldName, value, precision = 1) {
-  if (value != null)
-    document.getElementById(fieldName).innerHTML = value.toFixed(precision);
-}
-
-let is_running = false;
-let demo_button = document.getElementById("start_demo");
-demo_button.onclick = function (e) {
-  e.preventDefault();
-
-  // Request permission for iOS 13+ devices
-  if (
-    DeviceMotionEvent &&
-    typeof DeviceMotionEvent.requestPermission === "function"
-  ) {
-    DeviceMotionEvent.requestPermission();
-  }
-
-  if (is_running) {
-    window.removeEventListener("deviceorientation", handleOrientation);
-    demo_button.innerHTML = "Start demo";
-    updateFieldIfNotNull("Orientation_a", 0);
-    updateFieldIfNotNull("Orientation_b", 0);
-    updateFieldIfNotNull("Orientation_g", 0);
-    is_running = false;
-  } else {
-    window.addEventListener("deviceorientation", handleOrientation);
-    document.getElementById("start_demo").innerHTML = "Stop demo";
-    is_running = true;
-  }
-};
