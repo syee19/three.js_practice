@@ -1,31 +1,31 @@
 import * as THREE from "three";
 
 function main() {
-  const canvas = document.querySelector("#c");
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  var canvas = document.querySelector("#c");
+  var renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 
-  const fov = 75;
-  const aspect = 1; // the canvas default
-  const near = 0.1;
-  const far = 10;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  var fov = 75;
+  var aspect = 1; // the canvas default
+  var near = 0.1;
+  var far = 10;
+  var camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.z = 4.5;
 
-  const scene = new THREE.Scene();
+  var scene = new THREE.Scene();
 
-  const geometry = new THREE.SphereGeometry(2.5, 32, 16);
-  const material = new THREE.MeshBasicMaterial({
+  var geometry = new THREE.SphereGeometry(2.5, 32, 16);
+  var material = new THREE.MeshBasicMaterial({
     color: 0xffffff,
     transparent: true,
     opacity: 0.1,
   });
-  const snowBall = new THREE.Mesh(geometry, material);
+  var snowBall = new THREE.Mesh(geometry, material);
   scene.add(snowBall);
 
   //* mesh 생성 함수
   function addShape(x, y, z) {
     //star shape (*)
-    const shape = new THREE.Shape()
+    var shape = new THREE.Shape()
       .moveTo(3, 5)
       .lineTo(3, 21)
       .lineTo(-3, 21)
@@ -67,8 +67,8 @@ function main() {
   var arr = [];
   var velo = [];
   var len = 10;
-  const n = 40;
-  const seta = (Math.PI * 2) / n;
+  var n = 40;
+  var seta = (Math.PI * 2) / n;
   var shx, shy, shz;
   for (var i = 0; i < n; i++) {
     len = Math.random() * 0.4 + 0.6;
@@ -82,10 +82,10 @@ function main() {
   }
 
   function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientWidth;
-    const needResize = canvas.width !== width || canvas.height !== height;
+    var canvas = renderer.domElement;
+    var width = canvas.clientWidth;
+    var height = canvas.clientWidth;
+    var needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
       renderer.setSize(width, height, false);
     }
@@ -93,11 +93,11 @@ function main() {
   }
 
   let dir = new THREE.Vector3();
-  const origin = new THREE.Vector3(0, 0, 0);
-  const length = 1;
-  const hex = 0xffffff;
+  var origin = new THREE.Vector3(0, 0, 0);
+  var length = 1;
+  var hex = 0xffffff;
 
-  const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
+  var arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
   scene.add(arrowHelper);
 
   // render 혹은 animate loop를 불러 렌더링하기
