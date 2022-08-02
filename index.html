@@ -34,7 +34,7 @@
         font-weight: 600;
         transition: 0.25s;
         background-color: #5b8d80;
-        color: aliceblue;
+        color: #f0f8ff;
       }
       .container {
         height: 100vh;
@@ -42,7 +42,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background: rgb(27, 27, 27);
+        background: #171717;
       }
       .inner {
         height: auto;
@@ -67,7 +67,7 @@
       <canvas id="c"></canvas>
       <div id="info">
         <div class="container inner">
-          <a id="start_demo" class="btn" href="#" role="button">Start demo</a>
+          <a id="start_demo" class="btn" href="#" role="button">Start</a>
           <ul>
             <li>
               X-axis: <span id="Accelerometer_gx">0.0</span
@@ -90,22 +90,28 @@
 
       function main() {
         const canvas = document.querySelector("#c");
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
+          antialias: true,
+          alpha: true,
+        });
 
-        const fov = 75;
-        const aspect = 1; // the canvas default
+        const fov = 70;
+        const aspect = 1;
         const near = 0.1;
         const far = 10;
         const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         camera.position.z = 4.5;
 
         const scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x171717, 1, 6.5);
+        //scene.background = new THREE.Color(0x171717);
 
         const geometry = new THREE.SphereGeometry(2.5, 32, 16);
         const material = new THREE.MeshBasicMaterial({
           color: 0xffffff,
           transparent: true,
-          opacity: 0.1,
+          opacity: 0.05,
         });
         const snowBall = new THREE.Mesh(geometry, material);
         scene.add(snowBall);
@@ -141,7 +147,7 @@
           let mesh = new THREE.Mesh(
             geometry,
             new THREE.MeshBasicMaterial({
-              color: 0x5b8d80,
+              color: 0xf0f8ff, //0x5b8d80,
               side: THREE.DoubleSide,
             })
           );
@@ -154,10 +160,9 @@
         //원점 주변에 일정 간격으로 랜덤하게 * mesh 생성
         var arr = [];
         var velo = [];
-        var len = 10;
         var n = 50;
         const seta = (Math.PI * 2) / n;
-        var shx, shy, shz;
+        var len, shx, shy, shz;
         for (var i = 0; i < n; i++) {
           len = Math.random() * 0.4 + 0.6;
           shx = len * Math.sin(i * seta);
@@ -166,13 +171,13 @@
           len = Math.random() * 2.3;
           arr.push(addShape(len * shx, len * shy, len * shz));
           //arr.push(addShape(0, 0, 0));
-          velo.push(0.003 + Math.random() / 100);
+          velo.push(0.002 + Math.random() / 90);
         }
 
         //중력 방향 arrowHelper
         const dir = new THREE.Vector3(0, -1, 0);
         const origin = new THREE.Vector3(0, 0, 0);
-        const length = 1;
+        const length = 2;
         const hex = 0xffffff;
         const arrowHelper = new THREE.ArrowHelper(
           dir,
@@ -193,17 +198,18 @@
             camera.updateProjectionMatrix();
           }
 
-          if (is_running) {
-            gx = document.getElementById("Accelerometer_gx").innerHTML;
-            gy = document.getElementById("Accelerometer_gy").innerHTML;
-            gz = document.getElementById("Accelerometer_gz").innerHTML;
-            dir.set(gx, gy, gz);
-            dir.normalize();
-          } else {
+          gx = document.getElementById("Accelerometer_gx").innerHTML;
+          gy = document.getElementById("Accelerometer_gy").innerHTML;
+          gz = document.getElementById("Accelerometer_gz").innerHTML;
+          dir.set(gx, gy, gz);
+          dir.normalize();
+
+          if (dir.length() == 0) {
             dir.set(0, -1, 0);
           }
+
           arrowHelper.setDirection(dir);
-          arrowHelper.setLength(dir.length());
+          //arrowHelper.setLength(dir.length());
 
           //* 애니메이션
           for (var i = 0; i < arr.length; i++) {
@@ -292,14 +298,14 @@
 
         if (is_running) {
           window.removeEventListener("devicemotion", handleMotion);
-          demo_button.innerHTML = "Start demo";
+          demo_button.innerHTML = "Start";
           updateFieldIfNotNull("Accelerometer_gx", 0.0);
           updateFieldIfNotNull("Accelerometer_gy", 0.0);
           updateFieldIfNotNull("Accelerometer_gz", 0.0);
           is_running = false;
         } else {
           window.addEventListener("devicemotion", handleMotion);
-          document.getElementById("start_demo").innerHTML = "Stop demo";
+          demo_button.innerHTML = "Stop";
           is_running = true;
         }
       };
