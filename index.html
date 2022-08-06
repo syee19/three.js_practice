@@ -88,6 +88,8 @@
     <script type="module">
       import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r125/build/three.module.js";
 
+      let basisDir = 1;
+
       function main() {
         const canvas = document.querySelector("#c");
         const renderer = new THREE.WebGLRenderer({
@@ -198,9 +200,9 @@
             camera.updateProjectionMatrix();
           }
 
-          gx = document.getElementById("Accelerometer_gx").innerHTML;
-          gy = document.getElementById("Accelerometer_gy").innerHTML;
-          gz = document.getElementById("Accelerometer_gz").innerHTML;
+          gx = basisDir * document.getElementById("Accelerometer_gx").innerHTML;
+          gy = basisDir * document.getElementById("Accelerometer_gy").innerHTML;
+          gz = basisDir * document.getElementById("Accelerometer_gz").innerHTML;
           dir.set(gx, gy, gz);
           dir.normalize();
 
@@ -287,12 +289,14 @@
             .then((state) => {
               if (state === "granted") {
                 //window.alert("granted!");
+                basisDir = 1;
               } else {
                 //window.alert("denied!");
               }
             })
             .catch(console.error);
         } else {
+          basisDir = -1;
           // Handle regular non iOS 13+ devices.
         }
 
