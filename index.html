@@ -199,11 +199,13 @@
           if (resizeRendererToDisplaySize(renderer)) {
             camera.updateProjectionMatrix();
           }
-
+          var w = 2;
           gx = basisDir * document.getElementById("Accelerometer_gx").innerHTML;
           gy = basisDir * document.getElementById("Accelerometer_gy").innerHTML;
           gz = basisDir * document.getElementById("Accelerometer_gz").innerHTML;
-          dir.set(gx, gy, gz);
+          var temp = new THREE.Vector3(gx, gy, gz);
+          dir.addScaledVector(temp, w);
+          //dir.set(gx, gy, gz);
           dir.normalize();
 
           if (dir.length() == 0) {
