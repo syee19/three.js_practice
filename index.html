@@ -216,7 +216,6 @@
           //* 애니메이션
           for (var i = 0; i < arr.length; i++) {
             //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
-            /* 구 범위를 벗어나면 점대칭이동
             arr[i].position.x += velo[i] * dir.x;
             arr[i].position.y += velo[i] * dir.y;
             arr[i].position.z += velo[i] * dir.z;
@@ -224,21 +223,6 @@
               arr[i].position.x *= -1;
               arr[i].position.y *= -1;
               arr[i].position.z *= -1;
-            }
-            */
-            if (getDistance(arr[i]) >= 2.35) {
-              var sdir = slideDirection(arr[i], dir);
-              arr[i].position.x += sdir.x;
-              arr[i].position.y += sdir.y;
-              arr[i].position.z += sdir.z;
-            } else {
-              arr[i].position.x += velo[i] * dir.x;
-              arr[i].position.y += velo[i] * dir.y;
-              arr[i].position.z += velo[i] * dir.z;
-              if (getDistance(arr[i]) >= 2.5) {
-                arr[i].position.normalize();
-                arr[i].position.multiplyScalar(2.35);
-              }
             }
             arr[i].lookAt(camera.position);
           }
@@ -251,17 +235,6 @@
       }
 
       main();
-
-      function slideDirection(arr, dir) {
-        var pjdir = dir.clone();
-        var res = new THREE.Vector3();
-        res.subVectors(dir, pjdir.projectOnVector(arr.position));
-        res = res.multiplyScalar(
-          Math.pow(Math.sin(dir.angleTo(arr.position)) * 0.8, 15)
-        );
-        return res;
-      }
-      console.log(Math.sin(1.57));
 
       function resizeRendererToDisplaySize(renderer) {
         const canvas = renderer.domElement;
