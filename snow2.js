@@ -85,7 +85,7 @@ function main() {
     len = Math.random() * 2.3;
     arr.push(addShape(len * shx, len * shy, len * shz));
     //arr.push(addShape(0, 0, 0));
-    velo.push(0.002 + Math.random() / 90);
+    velo.push(0.005 + Math.random() / 300);
   }
 
   //중력 방향 arrowHelper
@@ -124,14 +124,26 @@ function main() {
     //* 애니메이션
     for (var i = 0; i < arr.length; i++) {
       //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
-      arr[i].position.x += velo[i] * dir.x;
-      arr[i].position.y += velo[i] * dir.y;
-      arr[i].position.z += velo[i] * dir.z;
-      if (getDistance(arr[i]) >= 2.3) {
-        arr[i].position.x *= -1;
-        arr[i].position.y *= -1;
-        arr[i].position.z *= -1;
+      // arr[i].position.x += velo[i] * dir.x;
+      // arr[i].position.y += velo[i] * dir.y;
+      // arr[i].position.z += velo[i] * dir.z;
+      // if (getDistance(arr[i]) >= 2.3) {
+      //   arr[i].position.x *= -1;
+      //   arr[i].position.y *= -1;
+      //   arr[i].position.z *= -1;
+      // }
+      var temp;
+      if (
+        getDistance(arr[i]) >= 2.3 &&
+        dir.angleTo(arr[i].position) < Math.PI / 2
+      ) {
+        temp = slideDirection(arr[i], dir);
+      } else {
+        temp = dir;
       }
+      arr[i].position.x += velo[i] * temp.x;
+      arr[i].position.y += velo[i] * temp.y;
+      arr[i].position.z += velo[i] * temp.z;
       arr[i].lookAt(camera.position);
     }
 
@@ -143,6 +155,19 @@ function main() {
 }
 
 main();
+
+function slideDirection(arr, dir) {
+  var pjdir = dir.clone();
+  var res = new THREE.Vector3();
+  res.subVectors(dir, pjdir.projectOnVector(arr.position));
+  res = res.multiplyScalar(
+    Math.pow(
+      Math.sin(dir.angleTo(arr.position)) * 0.8,
+      Math.cos(dir.angleTo(arr.position)) * 8
+    )
+  );
+  return res;
+}
 
 function resizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;
