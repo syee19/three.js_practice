@@ -30,6 +30,18 @@ function main() {
   const snowBall = new THREE.Mesh(geometry, material);
   scene.add(snowBall);
 
+  let cdist = 1.6;
+  let rad = Math.sqrt(Math.pow(2.5, 2) - Math.pow(cdist, 2));
+  const cgeo = new THREE.CircleGeometry(rad, 32);
+  const cmat = new THREE.MeshBasicMaterial({ color: 0xf0f8ff });
+  const plane = new THREE.Mesh(cgeo, cmat);
+  scene.add(plane);
+  let cang = (-5 / 180) * Math.PI;
+  console.log(cang);
+  plane.position.y = -cdist * Math.cos(cang);
+  plane.position.z = -cdist * Math.sin(cang);
+  plane.lookAt(0, 0, 0);
+
   //* mesh 생성 함수
   function addShape(x, y, z) {
     //star shape (*)
