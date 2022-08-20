@@ -9,6 +9,7 @@ function main() {
     antialias: true,
     alpha: true,
   });
+  renderer.sortObjects = false;
 
   const fov = 70;
   const aspect = 1;
@@ -16,33 +17,66 @@ function main() {
   const far = 10;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.z = 4.5;
+  //camera.position.x = 4.5;
+  camera.lookAt(0, 0, 0);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x171717, 1, 6.5);
+  scene.fog = new THREE.Fog(0x717171, 1, 6.5);
   //scene.background = new THREE.Color(0x171717);
+
+  let cdist = 1.2; //바닥 깊이
+
+  const planeWidth = 2.9 / 4;
+  const planeHeight = 5.7 / 4;
+  const pgeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
+
+  const loader = new THREE.TextureLoader();
+
+  function makeInstance(pgeo, url, xpos, zpos) {
+    const texture = loader.load(url, render);
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      alphaTest: 0,
+      transparent: true,
+      fog: false,
+    });
+
+    const mesh = new THREE.Mesh(pgeo, material);
+    scene.add(mesh);
+    mesh.position.x = xpos;
+    mesh.position.y = -cdist + planeHeight / 2 - zpos / 10;
+    mesh.position.z = zpos;
+  }
+
+  makeInstance(pgeo, "./sample.png", -1.2, -1);
+  // makeInstance(pgeo, "./sample.png", 0, -1);
+  // makeInstance(pgeo, "./sample.png", 1.2, -1);
+  // makeInstance(pgeo, "./sample.png", -0.6, 0);
+  // makeInstance(pgeo, "./sample.png", 0.6, 0);
+  // makeInstance(pgeo, "./sample.png", -1.2, 1);
+  // makeInstance(pgeo, "./sample.png", 0, 1);
+  makeInstance(pgeo, "./sample.png", 1.2, 1);
 
   const geometry = new THREE.SphereGeometry(2.5, 32, 16);
   const material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
+    color: 0x4d4e6a,
     transparent: true,
     opacity: 0.05,
   });
   const snowBall = new THREE.Mesh(geometry, material);
   scene.add(snowBall);
 
-  let cdist = 1.6;
   let rad = Math.sqrt(Math.pow(2.5, 2) - Math.pow(cdist, 2));
   const cgeo = new THREE.CircleGeometry(rad, 32);
-  const cmat = new THREE.MeshBasicMaterial({ color: 0xf0f8ff });
+  const cmat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const plane = new THREE.Mesh(cgeo, cmat);
-  scene.add(plane);
-  let cang = (-5 / 180) * Math.PI;
-  console.log(cang);
+  let cang = (5 / 180) * Math.PI;
   plane.position.y = -cdist * Math.cos(cang);
   plane.position.z = -cdist * Math.sin(cang);
   plane.lookAt(0, 0, 0);
+  scene.add(plane);
 
-  //* mesh 생성 함수
+  // mesh 생성 함수
   function addShape(x, y, z) {
     //star shape (*)
     const shape = new THREE.Shape()
@@ -73,7 +107,8 @@ function main() {
     let mesh = new THREE.Mesh(
       geometry,
       new THREE.MeshBasicMaterial({
-        color: 0xf0f8ff, //0x5b8d80,
+        color: 0x555555, //0x5b8d80,
+
         side: THREE.DoubleSide,
       })
     );
@@ -89,24 +124,26 @@ function main() {
   var n = 50;
   const seta = (Math.PI * 2) / n;
   var len, shx, shy, shz;
+  var pm = 1;
   for (var i = 0; i < n; i++) {
     len = Math.random() * 0.4 + 0.6;
     shx = len * Math.sin(i * seta);
     shy = len * Math.cos(i * seta);
-    shz = Math.sqrt(1 - shx * shx - shy * shy);
+    shz = Math.sqrt(1 - shx * shx - shy * shy) * pm;
     len = Math.random() * 2.3;
     arr.push(addShape(len * shx, len * shy, len * shz));
     //arr.push(addShape(0, 0, 0));
     velo.push(0.005 + Math.random() / 300);
+    pm *= -1;
   }
 
   //중력 방향 arrowHelper
   const dir = new THREE.Vector3(0, -1, 0);
   const origin = new THREE.Vector3(0, 0, 0);
   const length = 2;
-  const hex = 0xffffff;
-  const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex, 0.4);
-  scene.add(arrowHelper);
+  // const hex = 0xffffff;
+  // const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex, 0.4);
+  // scene.add(arrowHelper);
 
   var gx;
   var gy;
@@ -130,7 +167,7 @@ function main() {
       dir.set(0, -1, 0);
     }
 
-    arrowHelper.setDirection(dir);
+    //arrowHelper.setDirection(dir);
     //arrowHelper.setLength(dir.length());
 
     //* 애니메이션
@@ -165,9 +202,13 @@ function main() {
       arr[i].position.x += velo[i] * dir.x;
       arr[i].position.y += velo[i] * dir.y;
       arr[i].position.z += velo[i] * dir.z;
-      if (arr[i].position.y < -cdist + 0.15) {
-        arr[i].position.y = -cdist + 0.15;
-      } else if (getDistance(arr[i]) >= 2.3) {
+      if (
+        arr[i].position.y <
+        -cdist + 0.05 - arr[i].position.z * Math.tan(cang)
+      ) {
+        arr[i].position.y = -cdist + 0.05 - arr[i].position.z * Math.tan(cang);
+      }
+      if (getDistance(arr[i]) >= 2.3) {
         arr[i].position.multiplyScalar(2.3 / getDistance(arr[i]));
       }
     }
