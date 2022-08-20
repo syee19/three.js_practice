@@ -135,6 +135,7 @@ function main() {
 
     //* 애니메이션
     for (var i = 0; i < arr.length; i++) {
+      //방법 1: 중력방향 기준으로 구 바닥쪽과 닿으면 점대칭이동
       //if (arr[i].position.y <= -2.5) arr[i].position.y = 2.5;
       // arr[i].position.x += velo[i] * dir.x;
       // arr[i].position.y += velo[i] * dir.y;
@@ -144,19 +145,31 @@ function main() {
       //   arr[i].position.y *= -1;
       //   arr[i].position.z *= -1;
       // }
-      var temp;
-      if (
-        getDistance(arr[i]) >= 2.3 &&
-        dir.angleTo(arr[i].position) < Math.PI / 2
-      ) {
-        temp = slideDirection(arr[i], dir);
-      } else {
-        temp = dir;
+
+      //방법 2: 중력방향 기준 아래쪽 반구에서 바닥쪽과 닿으면 이동 방향을 접하는 평면위에 투사해서 미끄러지도록 함 + 속도 조절
+      // var temp;
+      // if (
+      //   getDistance(arr[i]) >= 2.3 &&
+      //   dir.angleTo(arr[i].position) < Math.PI / 2
+      // ) {
+      //   temp = slideDirection(arr[i], dir);
+      // } else {
+      //   temp = dir;
+      // }
+      // arr[i].position.x += velo[i] * temp.x;
+      // arr[i].position.y += velo[i] * temp.y;
+      // arr[i].position.z += velo[i] * temp.z;
+      // arr[i].lookAt(camera.position);
+
+      //방법 3: 일단 속도만큼 이동한 후 원점과의 거리가 구 반지름보다 크면 반지름으로 clamp한 위치로 위지를 update
+      arr[i].position.x += velo[i] * dir.x;
+      arr[i].position.y += velo[i] * dir.y;
+      arr[i].position.z += velo[i] * dir.z;
+      if (arr[i].position.y < -cdist + 0.15) {
+        arr[i].position.y = -cdist + 0.15;
+      } else if (getDistance(arr[i]) >= 2.3) {
+        arr[i].position.multiplyScalar(2.3 / getDistance(arr[i]));
       }
-      arr[i].position.x += velo[i] * temp.x;
-      arr[i].position.y += velo[i] * temp.y;
-      arr[i].position.z += velo[i] * temp.z;
-      arr[i].lookAt(camera.position);
     }
 
     renderer.render(scene, camera);
@@ -192,6 +205,7 @@ function resizeRendererToDisplaySize(renderer) {
   return needResize;
 }
 
+//point와 wolrd origin 사이의 거리 반환
 function getDistance(point) {
   var x2 = point.position.x * point.position.x;
   var y2 = point.position.y * point.position.y;
