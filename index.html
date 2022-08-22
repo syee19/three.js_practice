@@ -70,23 +70,29 @@
       <div id="info">
         <div class="container inner">
           <a id="start_demo" class="btn" href="#" role="button">Start</a>
-          <ul>
-            <li>
-              X-axis: <span id="Accelerometer_gx">0.0</span
-              ><span> m/s<sup>2</sup></span>
-            </li>
-            <li>
-              Y-axis: <span id="Accelerometer_gy">0.0</span
-              ><span> m/s<sup>2</sup></span>
-            </li>
-            <li>
-              Z-axis: <span id="Accelerometer_gz">0.0</span
-              ><span> m/s<sup>2</sup></span>
-            </li>
-          </ul>
+          <a id="debug" class="btn" href="#" role="button">Debug</a>
+          <div style="display: none">
+            <ul>
+              <li>
+                X-axis: <span id="Accelerometer_gx">0.0</span
+                ><span> m/s<sup>2</sup></span>
+              </li>
+              <li>
+                Y-axis: <span id="Accelerometer_gy">0.0</span
+                ><span> m/s<sup>2</sup></span>
+              </li>
+              <li>
+                Z-axis: <span id="Accelerometer_gz">0.0</span
+                ><span> m/s<sup>2</sup></span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
+    <script>
+      var shakeTime = 0;
+    </script>
     <script src="./orientation.js"></script>
     <script type="module" src="./snow2.js"></script>
     <script>
@@ -97,7 +103,8 @@
         myShakeEvent.start();
         window.addEventListener("shake", shakeEventDidOccur, false);
         function shakeEventDidOccur() {
-          alert("Shake!");
+          //alert("Shake!");
+          if (shakeTime === 0) shakeTime = 1000;
         }
       };
     </script>

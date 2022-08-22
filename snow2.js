@@ -5,6 +5,10 @@ var speed = 20; //units a second
 var delta = 0;
 
 let basisDir = 1;
+var prevdir = [];
+for (var i = 0; i < 40; i++) {
+  prevdir[i] = new THREE.Vector3(0, -1, 0);
+}
 
 function main() {
   const canvas = document.querySelector("#c");
@@ -164,6 +168,8 @@ function main() {
     gz = basisDir * document.getElementById("Accelerometer_gz").innerHTML;
     var temp = new THREE.Vector3(gx, gy, gz);
     dir.addScaledVector(temp, w);
+    lowpassFilter(dir);
+
     //dir.set(gx, gy, gz);
     dir.normalize();
 
@@ -218,6 +224,22 @@ function main() {
       }
     }
 
+    if (shakeTime != 0) {
+      for (var i = 0; i < arr.length; i++) {
+        var temp = new THREE.Vector3();
+        temp.crossVectors(dir, arr[i].position);
+        temp.lerp(temp, -0.8 * Math.sin(getDistance(arr[i]) / 2.3));
+        temp.lerp(dir, -0.1 * Math.sin(temp.angleTo(dir) / 2));
+        temp.multiplyScalar(20 * velo[i] * delta);
+        arr[i].position.addScaledVector(
+          temp,
+          (speed * (1400 - shakeTime)) / 500
+        );
+      }
+      shakeTime--;
+      lowpassFilter(dir);
+    }
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
   }
@@ -259,4 +281,21 @@ function getDistance(point) {
   //dist = Math.cqrt(x2 + y2 + z2);
   var dist = Math.sqrt(x2 + y2 + z2);
   return dist;
+}
+
+let debug_button = document.getElementById("debug");
+debug_button.onclick = function (e) {
+  e.preventDefault();
+  shakeTime = 1000;
+};
+
+function lowpassFilter(dir) {
+  prevdir[0].copy(dir);
+  for (var i = 1; i < prevdir.length; i++) {
+    prevdir[i].addVectors(
+      prevdir[i].multiplyScalar(0.9),
+      prevdir[i - 1].multiplyScalar(0.1)
+    );
+  }
+  dir.copy(prevdir[prevdir.length - 1]);
 }
