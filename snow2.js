@@ -1,5 +1,9 @@
 import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r125/build/three.module.js";
 
+var clock = new THREE.Clock();
+var speed = 20; //units a second
+var delta = 0;
+
 let basisDir = 1;
 
 function main() {
@@ -49,12 +53,12 @@ function main() {
   }
 
   makeInstance(pgeo, "./sample.png", -1.2, -1);
-  // makeInstance(pgeo, "./sample.png", 0, -1);
-  // makeInstance(pgeo, "./sample.png", 1.2, -1);
-  // makeInstance(pgeo, "./sample.png", -0.6, 0);
-  // makeInstance(pgeo, "./sample.png", 0.6, 0);
-  // makeInstance(pgeo, "./sample.png", -1.2, 1);
-  // makeInstance(pgeo, "./sample.png", 0, 1);
+  makeInstance(pgeo, "./sample.png", 0, -1);
+  makeInstance(pgeo, "./sample.png", 1.2, -1);
+  makeInstance(pgeo, "./sample.png", -0.6, 0);
+  makeInstance(pgeo, "./sample.png", 0.6, 0);
+  makeInstance(pgeo, "./sample.png", -1.2, 1);
+  makeInstance(pgeo, "./sample.png", 0, 1);
   makeInstance(pgeo, "./sample.png", 1.2, 1);
 
   const geometry = new THREE.SphereGeometry(2.5, 32, 16);
@@ -150,7 +154,7 @@ function main() {
   var gz;
 
   // render 혹은 animate loop를 불러 렌더링하기
-  function render(time) {
+  function render() {
     if (resizeRendererToDisplaySize(renderer)) {
       camera.updateProjectionMatrix();
     }
@@ -170,6 +174,7 @@ function main() {
     //arrowHelper.setDirection(dir);
     //arrowHelper.setLength(dir.length());
 
+    delta = clock.getDelta();
     //* 애니메이션
     for (var i = 0; i < arr.length; i++) {
       //방법 1: 중력방향 기준으로 구 바닥쪽과 닿으면 점대칭이동
@@ -199,9 +204,9 @@ function main() {
       // arr[i].lookAt(camera.position);
 
       //방법 3: 일단 속도만큼 이동한 후 원점과의 거리가 구 반지름보다 크면 반지름으로 clamp한 위치로 위지를 update
-      arr[i].position.x += velo[i] * dir.x;
-      arr[i].position.y += velo[i] * dir.y;
-      arr[i].position.z += velo[i] * dir.z;
+      arr[i].position.x += velo[i] * dir.x * delta * speed;
+      arr[i].position.y += velo[i] * dir.y * delta * speed;
+      arr[i].position.z += velo[i] * dir.z * delta * speed;
       if (
         arr[i].position.y <
         -cdist + 0.05 - arr[i].position.z * Math.tan(cang)
