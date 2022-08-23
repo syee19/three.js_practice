@@ -10,6 +10,12 @@ for (var i = 0; i < 40; i++) {
   prevdir[i] = new THREE.Vector3(0, -1, 0);
 }
 
+let cdist = 1.2; //바닥 깊이
+let cang = (10 / 180) * Math.PI;
+
+const planeWidth = 2.9 / 4;
+const planeHeight = 5.7 / 4;
+
 function main() {
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({
@@ -19,27 +25,25 @@ function main() {
   });
   renderer.sortObjects = false;
 
-  const fov = 70;
+  const fov = 30;
   const aspect = 1;
   const near = 0.1;
-  const far = 10;
+  const far = 30;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 4.5;
-  //camera.position.x = 4.5;
+  var cameraRot = (Math.PI / 2) * 1;
+  camera.position.z = 10 * Math.sin(cameraRot);
+  camera.position.y = 10 * Math.cos(cameraRot);
+  //camera.position.x = 10;
   camera.lookAt(0, 0, 0);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x717171, 1, 6.5);
+  scene.fog = new THREE.Fog(0x717171, 6, 14.5);
   //scene.background = new THREE.Color(0x171717);
 
-  let cdist = 1.2; //바닥 깊이
-
-  const planeWidth = 2.9 / 4;
-  const planeHeight = 5.7 / 4;
   const pgeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
 
   const loader = new THREE.TextureLoader();
-
+  var mesh;
   function makeInstance(pgeo, url, xpos, zpos) {
     const texture = loader.load(url, render);
     const material = new THREE.MeshBasicMaterial({
@@ -49,21 +53,24 @@ function main() {
       fog: false,
     });
 
-    const mesh = new THREE.Mesh(pgeo, material);
+    mesh = new THREE.Mesh(pgeo, material);
     scene.add(mesh);
     mesh.position.x = xpos;
-    mesh.position.y = -cdist + planeHeight / 2 - zpos / 10;
+    mesh.position.y =
+      -cdist + planeHeight / 2 - mesh.position.z * Math.tan(cang);
     mesh.position.z = zpos;
   }
 
-  makeInstance(pgeo, "./sample.png", -1.2, -1);
-  makeInstance(pgeo, "./sample.png", 0, -1);
-  makeInstance(pgeo, "./sample.png", 1.2, -1);
-  makeInstance(pgeo, "./sample.png", -0.6, 0);
-  makeInstance(pgeo, "./sample.png", 0.6, 0);
-  makeInstance(pgeo, "./sample.png", -1.2, 1);
-  makeInstance(pgeo, "./sample.png", 0, 1);
-  makeInstance(pgeo, "./sample.png", 1.2, 1);
+  // makeInstance(pgeo, "./sample.png", -1.2, -1);
+  // makeInstance(pgeo, "./sample.png", 0, -1);
+  // makeInstance(pgeo, "./sample.png", 1.2, -1);
+  // makeInstance(pgeo, "./sample.png", -0.6, 0);
+  // makeInstance(pgeo, "./sample.png", 0.6, 0);
+  // makeInstance(pgeo, "./sample.png", -1.2, 1);
+  // makeInstance(pgeo, "./sample.png", 0, 1);
+  // makeInstance(pgeo, "./sample.png", 1.2, 1);
+
+  makeInstance(pgeo, "./sample.png", 0, 0);
 
   const geometry = new THREE.SphereGeometry(2.5, 32, 16);
   const material = new THREE.MeshBasicMaterial({
@@ -74,11 +81,10 @@ function main() {
   const snowBall = new THREE.Mesh(geometry, material);
   scene.add(snowBall);
 
-  let rad = Math.sqrt(Math.pow(2.5, 2) - Math.pow(cdist, 2));
+  let rad = Math.sqrt(Math.pow(2.5, 2) - Math.pow(Math.cos(cang) * cdist, 2));
   const cgeo = new THREE.CircleGeometry(rad, 32);
   const cmat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const plane = new THREE.Mesh(cgeo, cmat);
-  let cang = (5 / 180) * Math.PI;
   plane.position.y = -cdist * Math.cos(cang);
   plane.position.z = -cdist * Math.sin(cang);
   plane.lookAt(0, 0, 0);
@@ -240,11 +246,11 @@ function main() {
       lowpassFilter(dir);
     }
 
+    moveMesh(mesh);
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
   }
-
-  requestAnimationFrame(render);
 }
 
 main();
@@ -286,7 +292,7 @@ function getDistance(point) {
 let debug_button = document.getElementById("debug");
 debug_button.onclick = function (e) {
   e.preventDefault();
-  shakeTime = 1000;
+  shakeTime = 80;
 };
 
 function lowpassFilter(dir) {
@@ -298,4 +304,37 @@ function lowpassFilter(dir) {
     );
   }
   dir.copy(prevdir[prevdir.length - 1]);
+}
+
+var temp = null;
+var mv = false;
+
+$(document).ready(function () {
+  $(".btn").on("click", function (e) {
+    temp = e.target.id;
+    mv = true;
+  });
+});
+
+function moveMesh(mesh) {
+  var step = 0.45;
+  var count = 3;
+  if (!mv) return;
+  if (temp == "NW" && mesh.position.x + mesh.position.z > -count * step) {
+    mesh.position.x -= step;
+    mesh.position.z -= step;
+  } else if (temp == "NE" && mesh.position.x - mesh.position.z < count * step) {
+    mesh.position.x += step;
+    mesh.position.z -= step;
+  } else if (temp == "SW" && mesh.position.z - mesh.position.x < count * step) {
+    mesh.position.x -= step;
+    mesh.position.z += step;
+  } else if (temp == "SE" && mesh.position.x + mesh.position.z < count * step) {
+    mesh.position.x += step;
+    mesh.position.z += step;
+  }
+  mesh.position.y = -cdist + planeHeight / 2 - Math.tan(cang) * mesh.position.z;
+
+  console.log(mesh.position);
+  mv = false;
 }
