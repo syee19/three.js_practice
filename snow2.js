@@ -1,4 +1,5 @@
 import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r125/build/three.module.js";
+import { GLTFLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js";
 
 var clock = new THREE.Clock();
 var speed = 20; //units a second
@@ -10,8 +11,8 @@ for (var i = 0; i < 40; i++) {
   prevdir[i] = new THREE.Vector3(0, -1, 0);
 }
 
-let cdist = 1.2; //바닥 깊이
-let cang = (10 / 180) * Math.PI;
+let cdist = 1.7; //바닥 깊이
+let cang = (0 / 180) * Math.PI;
 
 const planeWidth = 2.9 / 4;
 const planeHeight = 5.7 / 4;
@@ -26,18 +27,24 @@ function main() {
   renderer.sortObjects = false;
 
   const fov = 30;
-  const aspect = 1;
+  const aspect = 310 / 466;
   const near = 0.1;
   const far = 30;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  var cameraRot = (Math.PI / 2) * 1;
-  camera.position.z = 10 * Math.sin(cameraRot);
-  camera.position.y = 10 * Math.cos(cameraRot);
+  var cameraRot = (Math.PI / 2) * 0.9; //0.75
+  camera.position.z = 16 * Math.sin(cameraRot);
+  camera.position.y = 16 * Math.cos(cameraRot);
   //camera.position.x = 10;
   camera.lookAt(0, 0, 0);
+  camera.position.y -= 1;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x717171, 6, 14.5);
+  scene.fog = new THREE.Fog(0x717171, 7, 18.5);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+  dirLight.position.set(16, 14.2, 4.5);
+  dirLight.target.position.set(0, 3, -2);
+  scene.add(dirLight);
+  scene.add(dirLight.target);
   //scene.background = new THREE.Color(0x171717);
 
   const pgeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
@@ -61,22 +68,15 @@ function main() {
     mesh.position.z = zpos;
   }
 
-  // makeInstance(pgeo, "./sample.png", -1.2, -1);
-  // makeInstance(pgeo, "./sample.png", 0, -1);
-  // makeInstance(pgeo, "./sample.png", 1.2, -1);
-  // makeInstance(pgeo, "./sample.png", -0.6, 0);
-  // makeInstance(pgeo, "./sample.png", 0.6, 0);
-  // makeInstance(pgeo, "./sample.png", -1.2, 1);
-  // makeInstance(pgeo, "./sample.png", 0, 1);
-  // makeInstance(pgeo, "./sample.png", 1.2, 1);
-
   makeInstance(pgeo, "./sample.png", 0, 0);
 
   const geometry = new THREE.SphereGeometry(2.5, 32, 16);
-  const material = new THREE.MeshBasicMaterial({
+  const material = new THREE.MeshPhongMaterial({
     color: 0x4d4e6a,
     transparent: true,
     opacity: 0.05,
+    shininess: 40,
+    specular: 0xffffff,
   });
   const snowBall = new THREE.Mesh(geometry, material);
   scene.add(snowBall);
@@ -120,10 +120,8 @@ function main() {
 
     let mesh = new THREE.Mesh(
       geometry,
-      new THREE.MeshBasicMaterial({
+      new THREE.MeshPhongMaterial({
         color: 0x555555, //0x5b8d80,
-
-        side: THREE.DoubleSide,
       })
     );
     mesh.position.set(x, y, z);
@@ -149,6 +147,15 @@ function main() {
     //arr.push(addShape(0, 0, 0));
     velo.push(0.005 + Math.random() / 300);
     pm *= -1;
+  }
+
+  {
+    const gltfLoader = new GLTFLoader();
+    const url = "./snowglobe.glb";
+    gltfLoader.load(url, (gltf) => {
+      const root = gltf.scene;
+      scene.add(root);
+    });
   }
 
   //중력 방향 arrowHelper
@@ -317,7 +324,7 @@ $(document).ready(function () {
 });
 
 function moveMesh(mesh) {
-  var step = 0.45;
+  var step = 0.4;
   var count = 3;
   if (!mv) return;
   if (temp == "NW" && mesh.position.x + mesh.position.z > -count * step) {
@@ -335,6 +342,5 @@ function moveMesh(mesh) {
   }
   mesh.position.y = -cdist + planeHeight / 2 - Math.tan(cang) * mesh.position.z;
 
-  console.log(mesh.position);
   mv = false;
 }
