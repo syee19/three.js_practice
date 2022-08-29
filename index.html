@@ -104,9 +104,10 @@
     </div>
     <script>
       var shakeTime = 0;
+      var interval = 80;
     </script>
     <script src="./orientation.js"></script>
-    <script type="module" src="./snow2.js"></script>
+    <script type="module" src="./snow1.js"></script>
     <script>
       window.onload = function () {
         var myShakeEvent = new Shake({
@@ -116,7 +117,9 @@
         window.addEventListener("shake", shakeEventDidOccur, false);
         function shakeEventDidOccur() {
           //alert("Shake!");
-          if (shakeTime === 0) shakeTime = 1000;
+          if (shakeTime === 0) {
+            shakeTime = interval;
+          }
         }
       };
     </script>
