@@ -249,19 +249,6 @@ function main() {
 
 main();
 
-function slideDirection(arr, dir) {
-  var pjdir = dir.clone();
-  var res = new THREE.Vector3();
-  res.subVectors(dir, pjdir.projectOnVector(arr.position));
-  res = res.multiplyScalar(
-    Math.pow(
-      Math.sin(dir.angleTo(arr.position)) * 0.8,
-      Math.cos(dir.angleTo(arr.position)) * 8
-    )
-  );
-  return res;
-}
-
 function resizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;
   const width = canvas.clientWidth;
@@ -311,21 +298,31 @@ $(document).ready(function () {
 });
 
 function moveMesh(mesh) {
-  var step = 0.4;
-  var count = 3;
+  var step = 0.6; //0.4
+  var count = 2;
   if (!mv) return;
-  if (temp == "NW" && mesh.position.x + mesh.position.z > -count * step) {
-    mesh.position.x -= step;
+  // if (temp == "NW" && mesh.position.x + mesh.position.z > -count * step) {
+  //   //mesh.position.x -= step;
+  //   //mesh.position.z -= step;
+  // } else if (temp == "NE" && mesh.position.x - mesh.position.z < count * step) {
+  //   // mesh.position.x += step;
+  //   // mesh.position.z -= step;
+  // } else if (temp == "SW" && mesh.position.z - mesh.position.x < count * step) {
+  //   // mesh.position.x -= step;
+  //   // mesh.position.z += step;
+  // } else if (temp == "SE" && mesh.position.x + mesh.position.z < count * step) {
+  //   // mesh.position.x += step;
+  //   // mesh.position.z += step;
+  // }
+
+  if (temp == "NW" && mesh.position.z > -count * step) {
     mesh.position.z -= step;
-  } else if (temp == "NE" && mesh.position.x - mesh.position.z < count * step) {
-    mesh.position.x += step;
-    mesh.position.z -= step;
-  } else if (temp == "SW" && mesh.position.z - mesh.position.x < count * step) {
+  } else if (temp == "NE" && mesh.position.z < count * step) {
+    mesh.position.z += step;
+  } else if (temp == "SW" && mesh.position.x > -count * step) {
     mesh.position.x -= step;
-    mesh.position.z += step;
-  } else if (temp == "SE" && mesh.position.x + mesh.position.z < count * step) {
+  } else if (temp == "SE" && mesh.position.x < count * step) {
     mesh.position.x += step;
-    mesh.position.z += step;
   }
   mesh.position.y = -cdist + planeHeight / 2 - Math.tan(cang) * mesh.position.z;
 
