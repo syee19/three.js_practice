@@ -19,39 +19,39 @@ let cang = (0 / 180) * Math.PI; //바닥 기울기
 const planeWidth = 2.9 / 4;
 const planeHeight = 5.7 / 4;
 
+const canvas = document.querySelector("#c");
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  alpha: true,
+});
+renderer.sortObjects = false;
+
+//카메라, 씬, 조명 설정
+{
+  const fov = 30;
+  const aspect = 310 / 466;
+  const near = 0.1;
+  const far = 30;
+  var camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  var cameraRot = (Math.PI / 2) * 0.95; //0.75 //카메라 시점 상하 위치
+  camera.position.z = 16 * Math.sin(cameraRot);
+  camera.position.y = 16 * Math.cos(cameraRot);
+  //camera.position.x = 10;
+  camera.lookAt(0, 0, 0);
+  camera.position.y -= 1;
+
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x717171, 7, 18.5);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+  dirLight.position.set(16, 14.2, 4.5);
+  dirLight.target.position.set(0, 3, -2);
+  scene.add(dirLight);
+  scene.add(dirLight.target);
+  //scene.background = new THREE.Color(0x171717);
+}
+
 function main() {
-  const canvas = document.querySelector("#c");
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: true,
-  });
-  renderer.sortObjects = false;
-
-  //카메라, 씬, 조명 설정
-  {
-    const fov = 30;
-    const aspect = 310 / 466;
-    const near = 0.1;
-    const far = 30;
-    var camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    var cameraRot = (Math.PI / 2) * 0.95; //0.75 //카메라 시점 상하 위치
-    camera.position.z = 16 * Math.sin(cameraRot);
-    camera.position.y = 16 * Math.cos(cameraRot);
-    //camera.position.x = 10;
-    camera.lookAt(0, 0, 0);
-    camera.position.y -= 1;
-
-    var scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x717171, 7, 18.5);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 3);
-    dirLight.position.set(16, 14.2, 4.5);
-    dirLight.target.position.set(0, 3, -2);
-    scene.add(dirLight);
-    scene.add(dirLight.target);
-    //scene.background = new THREE.Color(0x171717);
-  }
-
   //캐릭터
   {
     var chaArr = [];
@@ -274,6 +274,22 @@ let debug_button = document.getElementById("debug");
 debug_button.onclick = function (e) {
   e.preventDefault();
   shakeTime = interval;
+};
+
+let camera_button = document.getElementById("camera");
+camera_button.onclick = function (e) {
+  e.preventDefault();
+  if (cameraRot == (Math.PI / 2) * 0.95) {
+    cameraRot = (Math.PI / 2) * 0.75;
+  } else {
+    cameraRot = (Math.PI / 2) * 0.95;
+  }
+  camera.position.z = 16 * Math.sin(cameraRot);
+  camera.position.y = 16 * Math.cos(cameraRot);
+  //camera.position.x = 10;
+  camera.lookAt(0, 0, 0);
+  camera.position.y -= 1;
+  camera.updateProjectionMatrix();
 };
 
 function lowpassFilter(dir) {
