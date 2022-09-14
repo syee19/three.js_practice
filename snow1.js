@@ -101,11 +101,48 @@ function main() {
     plane.lookAt(0, 0, 0);
     scene.add(plane);
 
+    //스노우볼 이름 텍스처 생성
+    var txt = "스노우볼 이름"; //나중에 변수로 받아올 값
+    var hWorldAll = 16;
+    var hWorldTxt = 2.8;
+    var hPxTxt = 60;
+
+    var kPxToWorld = hWorldTxt / hPxTxt;
+    var hPxAll = Math.ceil(hWorldAll / kPxToWorld);
+    var txtcanvas = document.createElement("canvas");
+    var ctx = txtcanvas.getContext("2d");
+    ctx.font = "bold " + hPxTxt + "px sans-serif";
+
+    var wPxTxt = ctx.measureText(txt).width * 0.8;
+    var wWorldTxt = wPxTxt * kPxToWorld;
+    var wWorldAll = wWorldTxt + (hWorldAll - hWorldTxt);
+    var wPxAll = Math.ceil(wWorldAll / kPxToWorld);
+    txtcanvas.width = wPxAll;
+    txtcanvas.height = hPxAll;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, wPxAll, hPxAll);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold " + hPxTxt + "px sans-serif";
+    ctx.fillText(txt, wPxAll / 2, hPxAll / 2);
+
+    var texture = new THREE.Texture(txtcanvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.needsUpdate = true;
+
     const gltfLoader = new GLTFLoader();
     const url = "./snowglobe.glb";
     gltfLoader.load(url, (gltf) => {
-      const root = gltf.scene;
-      scene.add(root);
+      const model = gltf.scene;
+      gltf.scene.traverse(function (object) {
+        if (object instanceof THREE.Mesh) {
+          var mat = object.material;
+          mat.map = texture;
+        }
+      });
+      scene.add(model);
     });
   }
 
