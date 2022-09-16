@@ -2,18 +2,18 @@ import * as THREE from "https://threejsfundamentals.org/threejs/resources/threej
 import { GLTFLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js";
 
 //애니메이션을 위한 변수
-var clock = new THREE.Clock();
-var speed = 20; //units a second
-var delta = 0;
+const clock = new THREE.Clock();
+const speed = 20; //units a second
+let delta = 0;
 
 let basisDir = 1; // 안드로이드, 아이폰 중력 센서 방향 지정
-var prevdir = [];
-for (var i = 0; i < 40; i++) {
+const prevdir = [];
+for (let i = 0; i < 40; i++) {
   prevdir[i] = new THREE.Vector3(0, -1, 0);
 }
 
-let cdist = 1.7; //바닥 깊이
-let cang = (0 / 180) * Math.PI; //바닥 기울기
+const cdist = 1.7; //바닥 깊이
+const cang = (0 / 180) * Math.PI; //바닥 기울기
 
 // 캐릭터 평면
 const planeWidth = 2.9 / 4;
@@ -28,56 +28,51 @@ const renderer = new THREE.WebGLRenderer({
 renderer.sortObjects = false;
 
 //카메라, 씬, 조명 설정
-{
-  const fov = 30;
-  const aspect = 310 / 466;
-  const near = 0.1;
-  const far = 30;
-  var camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  var cameraRot = (Math.PI / 2) * 0.95; //0.75 //카메라 시점 상하 위치
-  camera.position.z = 16 * Math.sin(cameraRot);
-  camera.position.y = 16 * Math.cos(cameraRot);
-  //camera.position.x = 10;
-  camera.lookAt(0, 0, 0);
-  camera.position.y -= 1;
+const fov = 30;
+const aspect = 310 / 466;
+const near = 0.1;
+const far = 30;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+let cameraRot = (Math.PI / 2) * 0.95; //0.75 //카메라 시점 상하 위치
+camera.position.z = 16 * Math.sin(cameraRot);
+camera.position.y = 16 * Math.cos(cameraRot);
+//camera.position.x = 10;
+camera.lookAt(0, 0, 0);
+camera.position.y -= 1;
 
-  var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x717171, 7, 18.5);
-  const dirLight = new THREE.DirectionalLight(0xffffff, 3);
-  dirLight.position.set(16, 14.2, 4.5);
-  dirLight.target.position.set(0, 3, -2);
-  scene.add(dirLight);
-  scene.add(dirLight.target);
-  //scene.background = new THREE.Color(0x171717);
-}
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x717171, 7, 18.5);
+const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+dirLight.position.set(16, 14.2, 4.5);
+dirLight.target.position.set(0, 3, -2);
+scene.add(dirLight);
+scene.add(dirLight.target);
+//scene.background = new THREE.Color(0x171717);
 
 function main() {
   //캐릭터
-  {
-    var chaArr = [];
-    const pgeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
-    const loader = new THREE.TextureLoader();
+  let chaArr = [];
+  const pgeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
+  const loader = new THREE.TextureLoader();
 
-    function createCharacter(pgeo, url, xpos, zpos) {
-      const texture = loader.load(url, render);
-      const material = new THREE.MeshBasicMaterial({
-        map: texture,
-        alphaTest: 0.1,
-        transparent: true,
-        fog: false,
-      });
-      var cha;
-      cha = new THREE.Mesh(pgeo, material);
-      scene.add(cha);
-      cha.position.x = xpos;
-      cha.position.y =
-        -cdist + planeHeight / 2 - cha.position.z * Math.tan(cang);
-      cha.position.z = zpos;
-      chaArr.push(cha);
-    }
-
-    createCharacter(pgeo, "./sample.png", 0, 0);
+  function createCharacter(pgeo, url, xpos, zpos) {
+    const texture = loader.load(url, render);
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      alphaTest: 0.1,
+      transparent: true,
+      fog: false,
+    });
+    let cha;
+    cha = new THREE.Mesh(pgeo, material);
+    scene.add(cha);
+    cha.position.x = xpos;
+    cha.position.y = -cdist + planeHeight / 2 - cha.position.z * Math.tan(cang);
+    cha.position.z = zpos;
+    chaArr.push(cha);
   }
+
+  createCharacter(pgeo, "./sample.png", 0, 0);
 
   //스노우볼 구, 바닥, 기둥
   {
@@ -90,7 +85,6 @@ function main() {
       specular: 0xffffff,
     });
     const snowBall = new THREE.Mesh(geometry, material);
-    scene.add(snowBall);
 
     let rad = Math.sqrt(Math.pow(2.5, 2) - Math.pow(Math.cos(cang) * cdist, 2));
     const cgeo = new THREE.CircleGeometry(rad, 32);
@@ -99,24 +93,23 @@ function main() {
     plane.position.y = -cdist * Math.cos(cang);
     plane.position.z = -cdist * Math.sin(cang);
     plane.lookAt(0, 0, 0);
-    scene.add(plane);
 
     //스노우볼 이름 텍스처 생성
-    var txt = "스노우볼 이름"; //나중에 변수로 받아올 값
-    var hWorldAll = 16;
-    var hWorldTxt = 2.8;
-    var hPxTxt = 60;
+    let txt = "스노우볼 이름"; //나중에 변수로 받아올 값
+    const hWorldAll = 16;
+    const hWorldTxt = 2.8;
+    const hPxTxt = 60;
 
-    var kPxToWorld = hWorldTxt / hPxTxt;
-    var hPxAll = Math.ceil(hWorldAll / kPxToWorld);
-    var txtcanvas = document.createElement("canvas");
-    var ctx = txtcanvas.getContext("2d");
+    const kPxToWorld = hWorldTxt / hPxTxt;
+    const hPxAll = Math.ceil(hWorldAll / kPxToWorld);
+    const txtcanvas = document.createElement("canvas");
+    const ctx = txtcanvas.getContext("2d");
     ctx.font = "bold " + hPxTxt + "px sans-serif";
 
-    var wPxTxt = ctx.measureText(txt).width * 0.8;
-    var wWorldTxt = wPxTxt * kPxToWorld;
-    var wWorldAll = wWorldTxt + (hWorldAll - hWorldTxt);
-    var wPxAll = Math.ceil(wWorldAll / kPxToWorld);
+    const wPxTxt = ctx.measureText(txt).width * 0.8;
+    const wWorldTxt = wPxTxt * kPxToWorld;
+    const wWorldAll = wWorldTxt + (hWorldAll - hWorldTxt);
+    const wPxAll = Math.ceil(wWorldAll / kPxToWorld);
     txtcanvas.width = wPxAll;
     txtcanvas.height = hPxAll;
 
@@ -128,7 +121,7 @@ function main() {
     ctx.font = "bold " + hPxTxt + "px sans-serif";
     ctx.fillText(txt, wPxAll / 2, hPxAll / 2);
 
-    var texture = new THREE.Texture(txtcanvas);
+    const texture = new THREE.Texture(txtcanvas);
     texture.minFilter = THREE.LinearFilter;
     texture.needsUpdate = true;
 
@@ -138,12 +131,14 @@ function main() {
       const model = gltf.scene;
       gltf.scene.traverse(function (object) {
         if (object instanceof THREE.Mesh) {
-          var mat = object.material;
+          const mat = object.material;
           mat.map = texture;
         }
       });
       scene.add(model);
     });
+    scene.add(snowBall);
+    scene.add(plane);
   }
 
   // mesh 생성 함수 (shape 대신 이미지로 변경 예정)
@@ -351,23 +346,9 @@ $(document).ready(function () {
 });
 
 function moveMesh(mesh) {
-  var step = 0.6; //0.4
+  var step = 0.55; //0.4
   var count = 2;
   if (!mv) return;
-  // if (temp == "NW" && mesh.position.x + mesh.position.z > -count * step) {
-  //   //mesh.position.x -= step;
-  //   //mesh.position.z -= step;
-  // } else if (temp == "NE" && mesh.position.x - mesh.position.z < count * step) {
-  //   // mesh.position.x += step;
-  //   // mesh.position.z -= step;
-  // } else if (temp == "SW" && mesh.position.z - mesh.position.x < count * step) {
-  //   // mesh.position.x -= step;
-  //   // mesh.position.z += step;
-  // } else if (temp == "SE" && mesh.position.x + mesh.position.z < count * step) {
-  //   // mesh.position.x += step;
-  //   // mesh.position.z += step;
-  // }
-
   if (temp == "NW" && mesh.position.z > -count * step) {
     mesh.position.z -= step;
   } else if (temp == "NE" && mesh.position.z < count * step) {
