@@ -166,10 +166,10 @@ function main() {
       .lineTo(3, 5); // close path
 
     //scale 조정
-    var s = 0.005;
-    var geometry = new THREE.ShapeGeometry(shape);
+    const s = 0.005;
+    const geometry = new THREE.ShapeGeometry(shape);
 
-    var mesh = new THREE.Mesh(
+    const mesh = new THREE.Mesh(
       geometry,
       new THREE.MeshPhongMaterial({
         color: 0x555555, //0x5b8d80,
@@ -182,12 +182,12 @@ function main() {
   }
 
   //파티클
-  var PartArr = []; //파티클 배열
-  var velo = []; //파티클마다 속도 다르도록 조정
-  var n = 50; //파티클 개수
+  const PartArr = []; //파티클 배열
+  const velo = []; //파티클마다 속도 다르도록 조정
+  const n = 50; //파티클 개수
   const seta = (Math.PI * 2) / n;
-  var len, shx, shy, shz;
-  for (var i = 0; i < n; i++) {
+  let len, shx, shy, shz;
+  for (let i = 0; i < n; i++) {
     len = Math.random() * 2.3 + 1;
     shx = len * Math.sin(i * seta);
     shz = len * Math.cos(i * seta);
@@ -198,20 +198,20 @@ function main() {
 
   const dir = new THREE.Vector3(0, -1, 0);
 
-  var gx;
-  var gy;
-  var gz;
+  let gx;
+  let gy;
+  let gz;
 
   // render 혹은 animate loop를 불러 렌더링하기
   function render() {
     if (resizeRendererToDisplaySize(renderer)) {
       camera.updateProjectionMatrix();
     }
-    var w = 2;
+    const w = 2;
     gx = basisDir * document.getElementById("Accelerometer_gx").innerHTML;
     gy = basisDir * document.getElementById("Accelerometer_gy").innerHTML;
     gz = basisDir * document.getElementById("Accelerometer_gz").innerHTML;
-    var temp = new THREE.Vector3(gx, gy, gz);
+    let temp = new THREE.Vector3(gx, gy, gz);
     dir.addScaledVector(temp, w);
     //lowpassFilter(dir);
 
@@ -223,7 +223,7 @@ function main() {
 
     delta = clock.getDelta();
     //* 애니메이션
-    for (var i = 0; i < PartArr.length; i++) {
+    for (let i = 0; i < PartArr.length; i++) {
       //방법 3: 일단 속도만큼 이동한 후 원점과의 거리가 구 반지름보다 크면 반지름으로 clamp한 위치로 위지를 update
       PartArr[i].position.x += velo[i] * dir.x * delta * speed;
       PartArr[i].position.y += velo[i] * dir.y * delta * speed;
@@ -243,11 +243,11 @@ function main() {
     //흔들었을 때 애니메이션
     if (shakeTime != 0) {
       if (shakeTime === interval)
-        for (var i = 0; i < PartArr.length; i++) {
+        for (let i = 0; i < PartArr.length; i++) {
           velo[i] = Math.abs(velo[i]);
         }
-      for (var i = 0; i < PartArr.length; i++) {
-        var temp = new THREE.Vector3();
+      for (let i = 0; i < PartArr.length; i++) {
+        let temp = new THREE.Vector3();
         temp.crossVectors(new THREE.Vector3(0, -1, 0), PartArr[i].position);
         temp.lerp(dir, -0.5 * Math.sin(getDistance(PartArr[i]) / 2.3));
         temp.lerp(dir, -0.9 * Math.sin(temp.angleTo(dir) / 2));
@@ -267,7 +267,7 @@ function main() {
       shakeTime--;
       //lowpassFilter(dir);
     } else {
-      for (var i = 0; i < PartArr.length; i++) {
+      for (let i = 0; i < PartArr.length; i++) {
         velo[i] = Math.abs(velo[i]);
       }
     }
@@ -294,11 +294,11 @@ function resizeRendererToDisplaySize(renderer) {
 
 //point와 wolrd origin 사이의 거리 반환
 function getDistance(point) {
-  var x2 = point.position.x * point.position.x;
-  var y2 = point.position.y * point.position.y;
-  var z2 = point.position.z * point.position.z;
+  const x2 = point.position.x * point.position.x;
+  const y2 = point.position.y * point.position.y;
+  const z2 = point.position.z * point.position.z;
   //dist = Math.cqrt(x2 + y2 + z2);
-  var dist = Math.sqrt(x2 + y2 + z2);
+  const dist = Math.sqrt(x2 + y2 + z2);
   return dist;
 }
 
@@ -326,7 +326,7 @@ camera_button.onclick = function (e) {
 
 function lowpassFilter(dir) {
   prevdir[0].copy(dir);
-  for (var i = 1; i < prevdir.length; i++) {
+  for (let i = 1; i < prevdir.length; i++) {
     prevdir[i].addVectors(
       prevdir[i].multiplyScalar(0.9),
       prevdir[i - 1].multiplyScalar(0.1)
@@ -335,8 +335,8 @@ function lowpassFilter(dir) {
   dir.copy(prevdir[prevdir.length - 1]);
 }
 
-var temp = null;
-var mv = false;
+let temp = null;
+let mv = false;
 
 $(document).ready(function () {
   $(".btn").on("click", function (e) {
@@ -346,8 +346,8 @@ $(document).ready(function () {
 });
 
 function moveMesh(mesh) {
-  var step = 0.55; //0.4
-  var count = 2;
+  const step = 0.55; //0.4
+  const count = 2;
   if (!mv) return;
   if (temp == "NW" && mesh.position.z > -count * step) {
     mesh.position.z -= step;
